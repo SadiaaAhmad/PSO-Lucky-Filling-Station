@@ -1,10 +1,12 @@
 # ⛽ PSO Lucky Filling Station — Accounting & Operations System
 
-![Flutter](https://img.shields.io/badge/Frontend-Flutter_3-02569B?logo=flutter)
-![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)
-![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python)
-![Database](https://img.shields.io/badge/Database-SQLite_/_PostgreSQL-003B57?logo=sqlite)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-Flutter_3-02569B?logo=flutter&logoColor=white" alt="Flutter">
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Database-SQLite%20%2F%20PostgreSQL-003B57?logo=sqlite&logoColor=white" alt="Database">
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
+</p>
 
 An enterprise-grade financial accounting and daily shift operations management system built specifically for **PSO (Pakistan State Oil) Filling Stations**. 
 
