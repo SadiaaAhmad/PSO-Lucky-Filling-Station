@@ -17,11 +17,18 @@ The system automates dispenser meter reconciliations, underground storage tank (
 ## 🌟 Key Features
 
 * **⛽ Dispenser Nozzle Reconciliation**: Real-time meter reading tracking across 6 dispensing units (HSD & PMG) with automatic gross and net sales calculation.
+<img width="299" height="602" alt="image" src="https://github.com/user-attachments/assets/eaf93b0d-6c5a-4965-97bc-d34d9f79c274" />
 * **📏 Tank Dip & Stock Loss Control**: Computes expected closing stocks against actual physical tank dips to track stock gain/loss variances in both Liters and PKR.
+<img width="301" height="604" alt="image" src="https://github.com/user-attachments/assets/91f3cd91-e93a-4d7f-82a8-60995ba1d339" />
 * **💳 PSO Card & Fleet Sales**: Automatic reconciliation of PSO Bank Card Sales and BPSO Fleet Cards with bank commission deductions.
+<img width="300" height="604" alt="image" src="https://github.com/user-attachments/assets/77f46a5d-0224-4803-9c7a-784b9b164aa4" />
 * **📖 Double-Entry Accounting Ledger**: Automated journal entry generation for assets, liabilities, revenue, and operating expenses.
+<img width="298" height="600" alt="image" src="https://github.com/user-attachments/assets/58119166-851f-485a-b288-de83b58f0b7d" />
+<img width="301" height="603" alt="image" src="https://github.com/user-attachments/assets/39fed59d-bbc7-4b3a-9f3d-768dcc680d60" />
 * **🤝 Udhaar (Credit) Customer Accounts**: Customer credit limits, balance tracking, repayment recoveries, and aging reports.
+<img width="300" height="606" alt="image" src="https://github.com/user-attachments/assets/689cbb25-a47e-4099-a13f-27e07eb3bb16" />
 * **📊 Financial Statements & Reports**: Monthly Profit & Loss (P&L) statements, Daily Shift Reports, Udhaar Summaries, and 1-click **PDF & Excel exports**.
+<img width="299" height="606" alt="image" src="https://github.com/user-attachments/assets/abeae719-cef6-46fb-b3ff-797f598c6e4d" />
 * **⚡ Auto-Discovery & Zero-Config Setup**: Automatic local network pairing between mobile phones and host PC with background server automation.
 
 ---
