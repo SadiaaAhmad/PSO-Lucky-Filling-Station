@@ -1,0 +1,79 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+
+# =========================
+# Flutter / Dart
+# =========================
+frontend/.dart_tool/
+frontend/build/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/.pub-cache/
+frontend/.pub/
+frontend/.idea/
+frontend/*.iml
+frontend/ios/Flutter/.last_build_id
+frontend/ios/Flutter/App.framework
+frontend/ios/Flutter/Flutter.framework
+frontend/ios/Flutter/Flutter.podspec
+
+# =========================
+# Android
+# =========================
+frontend/android/.gradle/
+frontend/android/local.properties
+frontend/android/**/build/
+frontend/android/app/debug/
+frontend/android/app/profile/
+frontend/android/app/release/
+
+# =========================
+# Windows / IDEs / Editors
+# =========================
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# =========================
+# Databases & Storage
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+backend/*.db
+
+# =========================
+# Logs & System Temp
+# =========================
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
