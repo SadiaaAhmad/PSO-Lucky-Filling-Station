@@ -68,6 +68,15 @@ frontend/android/app/release/
 backend/*.db
 
 # =========================
+# Excel Datasheets
+# =========================
+*.xlsx
+*.xls
+*.csv
+
+# =========================
+# Logs & System Temp
+# =========================
 # Logs & System Temp
 # =========================
 *.log
