@@ -1,33 +1,132 @@
-# Fuel Station Accounting System
+# ⛽ PSO Lucky Filling Station — Accounting & Operations System
 
-An automated fuel station accounting, stock management, and financial reporting system designed for **PSO Lucky Filling Station**.
+![Flutter](https://img.shields.io/badge/Frontend-Flutter_3-02569B?logo=flutter)
+![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)
+![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python)
+![Database](https://img.shields.io/badge/Database-SQLite_/_PostgreSQL-003B57?logo=sqlite)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-## Directory Structure
+An enterprise-grade financial accounting and daily shift operations management system built specifically for **PSO (Pakistan State Oil) Filling Stations**. 
+
+The system automates dispenser meter reconciliations, underground storage tank (UST) physical dip variance tracking, fuel lorry delivery inventory valuation, credit (udhaar) customer management, operating expenses, and double-entry general ledger accounting.
+
+---
+
+## 🌟 Key Features
+
+* **⛽ Dispenser Nozzle Reconciliation**: Real-time meter reading tracking across 6 dispensing units (HSD & PMG) with automatic gross and net sales calculation.
+* **📏 Tank Dip & Stock Loss Control**: Computes expected closing stocks against actual physical tank dips to track stock gain/loss variances in both Liters and PKR.
+* **💳 PSO Card & Fleet Sales**: Automatic reconciliation of PSO Bank Card Sales and BPSO Fleet Cards with bank commission deductions.
+* **📖 Double-Entry Accounting Ledger**: Automated journal entry generation for assets, liabilities, revenue, and operating expenses.
+* **🤝 Udhaar (Credit) Customer Accounts**: Customer credit limits, balance tracking, repayment recoveries, and aging reports.
+* **📊 Financial Statements & Reports**: Monthly Profit & Loss (P&L) statements, Daily Shift Reports, Udhaar Summaries, and 1-click **PDF & Excel exports**.
+* **⚡ Auto-Discovery & Zero-Config Setup**: Automatic local network pairing between mobile phones and host PC with background server automation.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Mobile & Desktop Frontend** | Flutter (Dart) — Cross-platform iOS, Android, and Desktop |
+| **REST API Backend** | FastAPI (Python 3.14) with Uvicorn ASGI Server |
+| **Database & ORM** | SQLite / PostgreSQL with SQLAlchemy ORM & Alembic migrations |
+| **Networking** | Self-healing local Wi-Fi IP auto-discovery client (`ApiClient`) |
+
+---
+
+## 🚀 Quick Start Guide (Desktop / Laptop)
+
+### 1. Prerequisites
+* [Python 3.10+](https://www.python.org/downloads/)
+* [Flutter SDK 3.x+](https://docs.flutter.dev/get-started/install)
+
+### 2. Backend Setup
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/SadiaaAhmad/PSO-Lucky-Filling-Station.git
+   cd PSO-Lucky-Filling-Station
+   ```
+2. Install Python dependencies:
+   ```bash
+   pip install -r backend/requirements.txt
+   ```
+3. Launch the Backend Server:
+   - **Option A (Manual)**:
+     ```bash
+     python -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+     ```
+   - **Option B (1-Click Batch File)**: Double-click `start_backend.bat` in the project root.
+   - **Option C (100% Silent Background Service)**: Double-click `run_backend_silent.vbs`. *(To run automatically when your PC boots, copy `run_backend_silent.vbs` to your Windows Startup folder: `Win + R` ➔ type `shell:startup`).*
+
+---
+
+## 📱 How to Run & Connect on Mobile Phones (Android / iOS)
+
+The mobile app includes **Automatic Network Auto-Discovery** — it automatically finds your computer's IP address on your local network!
+
+### Method 1: Connecting via Local Wi-Fi (Wireless)
+
+1. **Connect to Same Wi-Fi**: Ensure both your **Mobile Phone** and **Computer** are connected to the same Wi-Fi network.
+2. **Start Backend**: Ensure the FastAPI backend server is running on your PC (`start_backend.bat` or background service).
+3. **Launch Mobile App**: Open the Flutter app on your phone.
+4. **Auto-Pairing**: The app will automatically probe the local Wi-Fi network (`192.168.1.X`, etc.), locate the active server, and connect instantly **without typing any IP address!**
+
+---
+
+### Method 2: Connecting via USB Cable (ADB Reverse - Recommended for Android Developers)
+
+1. Connect your phone to your PC via USB cable and enable **USB Debugging**.
+2. Run ADB port forwarding command in terminal:
+   ```bash
+   adb reverse tcp:8000 tcp:8000
+   ```
+3. Run the app on your physical device:
+   ```bash
+   cd frontend
+   flutter run
+   ```
+4. The app will connect directly to `http://127.0.0.1:8000`.
+
+---
+
+### Method 3: Building Standalone APK for Android Phone Installation
+
+To install the app directly on an Android device without keeping it connected to a computer:
+
+1. Build the release APK:
+   ```bash
+   cd frontend
+   flutter build apk --release
+   ```
+2. The generated APK file will be located at:
+   `frontend/build/app/outputs/flutter-apk/app-release.apk`
+3. Transfer `app-release.apk` to your Android phone via USB/WhatsApp/Drive and tap to install!
+
+---
+
+## 📁 Repository Structure
 
 ```
-FuelStationAccounting/
-│
-├── backend/
-│   ├── database/     # Database setup, connection, and pool configuration
-│   ├── models/       # Entity schemas and database model definitions
-│   ├── migrations/   # Database migration scripts
-│   ├── services/     # Core accounting & stock calculation services
-│   └── seed/         # July 2026 historical seed data scripts
-│
-├── frontend/         # Frontend Web Application (Phase 2 - UI)
-│
-├── docs/             # Technical documentation & schema designs
-│
-└── README.md         # Project overview and development guide
+PSO-Lucky-Filling-Station/
+├── backend/                  # FastAPI Backend API
+│   ├── app/                  # Controllers, Models, Schemas & Services
+│   ├── seed/                 # Seeding scripts for initial fuel rates & accounts
+│   └── requirements.txt      # Python dependencies
+├── frontend/                 # Flutter Mobile & Desktop Application
+│   ├── lib/
+│   │   ├── core/             # Theme, Utilities, Formatters & Widgets
+│   │   ├── models/           # Data Models
+│   │   ├── screens/          # Dashboard, Operations, Stock, Finance & Reports
+│   │   └── services/         # ApiClient & ApiServices
+│   └── pubspec.yaml          # Flutter dependencies
+├── run_backend_silent.vbs    # Silent background server launcher
+├── start_backend.bat         # 1-Click interactive server launcher
+└── README.md                 # System documentation
 ```
 
-## Objective Sequence
+---
 
-1. **Excel Files Analysis** (Completed)
-2. **Understand Data & Domain Concepts** (Completed)
-3. **Database Schema & Relationships** (Proposed - Under User Review)
-4. **Accounting Calculations & Stock Engine**
-5. **Seed Existing July 2026 Data**
-6. **Test & Verify Calculations**
-7. **REST API Development**
-8. **Frontend UI**
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
