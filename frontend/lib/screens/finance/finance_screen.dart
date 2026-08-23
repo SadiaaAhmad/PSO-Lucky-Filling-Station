@@ -540,6 +540,17 @@ class _FinanceScreenState extends State<FinanceScreen> with SingleTickerProvider
       );
     }
 
+    if (_dailyLogs.isEmpty) {
+      return Scaffold(
+        appBar: const StationAppBar(subtitle: 'Finance Management'),
+        body: EmptyStateView(
+          title: 'No Daily Logs Found',
+          message: 'Create a Daily Log in Operations screen to record operating expenses, card sales, and cash movements.',
+          onRetry: _initialLoad,
+        ),
+      );
+    }
+
     final double totalCreditSales = _dailySummary != null ? double.tryParse(_dailySummary!.totalCreditSalesPkr) ?? 0.0 : 0.0;
     final double totalRecoveries = _dailySummary != null ? double.tryParse(_dailySummary!.totalCreditRecoveriesPkr) ?? 0.0 : 0.0;
     final double totalCardSales = _dailySummary != null ? double.tryParse(_dailySummary!.totalCardSalesPkr) ?? 0.0 : 0.0;

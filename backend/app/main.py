@@ -17,6 +17,22 @@ async def lifespan(app: FastAPI):
     try:
         Base.metadata.create_all(bind=engine)
         logging.info("Cloud Database tables checked/created successfully on app startup.")
+        
+        # Seed master data if database is fresh (0 accounts)
+        from backend.app.database.session import SessionLocal
+        db = SessionLocal()
+        try:
+            from backend.app.models.accounts import Account
+            if db.query(Account).count() == 0:
+                from backend.seed.seed_july_2026 import seed_master_data
+                seed_master_data(db)
+                db.commit()
+                logging.info("Master accounts, products, and tanks seeded successfully on boot.")
+        except Exception as seed_err:
+            logging.error(f"Auto-seed warning: {seed_err}")
+            db.rollback()
+        finally:
+            db.close()
     except Exception as e:
         logging.error(f"Error during startup database creation: {e}")
     yield
