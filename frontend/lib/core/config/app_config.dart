@@ -3,8 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppConfig {
   static const String _keyBaseUrl = 'fastapi_base_url';
   
-  // ADB reverse forwarded port is http://127.0.0.1:8000 (bypasses Windows Firewall & router isolation)
-  static String baseUrl = 'http://127.0.0.1:8000';
+  // 24/7 Live Cloud API endpoint (bypasses local Wi-Fi & laptop dependency)
+  static String baseUrl = 'https://pso-lucky-filling-station.vercel.app';
   static String get apiBaseUrl => baseUrl;
   
   static const String appName = 'PSO Lucky Filling Station';

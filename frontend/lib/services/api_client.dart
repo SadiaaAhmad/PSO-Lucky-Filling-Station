@@ -17,21 +17,13 @@ class ApiClient {
   static final http.Client _client = http.Client();
   static bool _isAutoDiscovering = false;
 
-  /// Candidate URLs for automatic discovery when running locally or on LAN
+  /// Candidate URLs for automatic discovery (cloud server first, then local/LAN)
   static List<String> get _candidateUrls => [
-    'http://127.0.0.1:8000', // Forwarded via ADB reverse (works 100% on physical USB & Wi-Fi debugging)
-    'http://192.168.1.4:8000', // Current Host PC's Wi-Fi IPv4 Address
-    'http://192.168.1.5:8000', // Previous Host PC's Wi-Fi IPv4 Address
+    'https://pso-lucky-filling-station.vercel.app', // 24/7 Live Cloud Server
     AppConfig.baseUrl,
-    'http://10.0.2.2:8000', // Android Emulator default host bridge
-    'http://192.168.1.2:8000',
-    'http://192.168.1.3:8000',
-    'http://192.168.1.6:8000',
-    'http://192.168.1.7:8000',
-    'http://192.168.1.8:8000',
-    'http://192.168.1.9:8000',
-    'http://192.168.1.10:8000',
-    'http://192.168.1.50:8000',
+    'http://127.0.0.1:8000', // ADB reverse local fallback
+    'http://192.168.1.4:8000', // Host PC Wi-Fi
+    'http://10.0.2.2:8000', // Android Emulator bridge
   ];
 
   /// Automatically discovers the active FastAPI backend on the local network
