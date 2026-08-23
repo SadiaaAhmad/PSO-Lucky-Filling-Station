@@ -141,6 +141,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
 
+    final isDailySelected = _selectedLog != null && _dailyData != null;
+    final dateLabel = _selectedLog != null ? Formatters.formatDate(_selectedLog!.logDate) : 'July 2026';
+    final displayNetProfit = (isDailySelected && (double.tryParse(_dailyData!.netProfitPkr) ?? 0) != 0)
+        ? _dailyData!.netProfitPkr
+        : _pnlData?.netProfit;
+    final displayRevenue = (isDailySelected && (double.tryParse(_dailyData!.totalRevenuePkr) ?? 0) != 0)
+        ? _dailyData!.totalRevenuePkr
+        : _pnlData?.totalIncome;
+    final displayExpenses = (isDailySelected && (double.tryParse(_dailyData!.totalExpensesPkr) ?? 0) != 0)
+        ? _dailyData!.totalExpensesPkr
+        : _pnlData?.totalExpenses;
+
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
       appBar: const StationAppBar(),
@@ -153,18 +165,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Financial Cards Grid
-                final isDailySelected = _selectedLog != null && _dailyData != null;
-                final dateLabel = _selectedLog != null ? Formatters.formatDate(_selectedLog!.logDate) : 'July 2026';
-                final displayNetProfit = (isDailySelected && (double.tryParse(_dailyData!.netProfitPkr) ?? 0) != 0)
-                    ? _dailyData!.netProfitPkr
-                    : _pnlData?.netProfit;
-                final displayRevenue = (isDailySelected && (double.tryParse(_dailyData!.totalRevenuePkr) ?? 0) != 0)
-                    ? _dailyData!.totalRevenuePkr
-                    : _pnlData?.totalIncome;
-                final displayExpenses = (isDailySelected && (double.tryParse(_dailyData!.totalExpensesPkr) ?? 0) != 0)
-                    ? _dailyData!.totalExpensesPkr
-                    : _pnlData?.totalExpenses;
-
                 Row(
                   children: [
                     Expanded(
