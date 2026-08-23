@@ -50,18 +50,20 @@ def get_customer_balance(id: int, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
+from backend.app.core.cache import api_cache
+
 @router.get("/", response_model=List[CustomerResponse])
 def list_customers(db: Session = Depends(get_db)):
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.info("[API] GET /customers/ - Listing all customers")
-    return CustomerService.get_all_customers(db)
+    cache_key = "list_customers"
+    cached = api_cache.get(cache_key)
+    if cached is not None:
+        return cached
+    res = CustomerService.get_all_customers(db)
+    api_cache.set(cache_key, res, ttl_seconds=120)
+    return res
 
 @router.get("/{id}", response_model=CustomerResponse)
 def get_customer(id: int, db: Session = Depends(get_db)):
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.info(f"[API] GET /customers/{id} - Getting customer details")
     try:
         return CustomerService.get_customer(db, id)
     except ValueError as e:
@@ -71,7 +73,4 @@ from backend.app.schemas.credit import CreditTransactionResponse
 
 @router.get("/{id}/ledger", response_model=List[CreditTransactionResponse])
 def get_customer_ledger(id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.info(f"[API] GET /customers/{id}/ledger - Getting customer ledger")
     return CustomerService.get_customer_ledger(db, id, skip, limit)

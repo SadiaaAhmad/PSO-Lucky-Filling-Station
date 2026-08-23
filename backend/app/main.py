@@ -30,6 +30,8 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+from starlette.middleware.gzip import GZipMiddleware
+
 # Configure CORS Middleware for local frontend development
 app.add_middleware(
     CORSMiddleware,
@@ -38,6 +40,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(GZipMiddleware, minimum_size=200)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):

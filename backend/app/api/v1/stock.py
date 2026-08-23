@@ -36,13 +36,18 @@ def list_tank_stocks(daily_log_id: int, db: Session = Depends(get_db)):
     logger.info(f"[API] GET /stock/tank-stocks?daily_log_id={daily_log_id}")
     return StockService.list_tank_stocks(db, daily_log_id)
 
+from backend.app.core.cache import api_cache
+
 @router.get("/tank-stocks/latest")
 @router.get("/latest")
 def get_latest_tank_stocks(db: Session = Depends(get_db)):
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.info("[API] GET /stock/tank-stocks/latest")
-    return StockService.get_latest_tank_stocks(db)
+    cache_key = "latest_tank_stocks"
+    cached = api_cache.get(cache_key)
+    if cached is not None:
+        return cached
+    res = StockService.get_latest_tank_stocks(db)
+    api_cache.set(cache_key, res, ttl_seconds=120)
+    return res
 
 @router.post("/tank-stocks/{stock_id}/reverse")
 def reverse_tank_stock(stock_id: int, payload: ReversalRequest, db: Session = Depends(get_db)):
