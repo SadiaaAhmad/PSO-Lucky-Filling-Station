@@ -94,6 +94,21 @@ class _StockReportScreenState extends State<StockReportScreen> {
       }
     }
 
+    if (_logs.isEmpty && !_isLoading) {
+      return Scaffold(
+        backgroundColor: AppTheme.bgLight,
+        appBar: const StationAppBar(
+          title: 'Fuel Stock Inventory Report',
+          showBackButton: true,
+        ),
+        body: EmptyStateView(
+          title: 'No Stock Dip Records Found',
+          message: 'Create a Daily Shift Log in Operations to record tank dip readings and fuel stock valuation.',
+          onRetry: _fetchInitialData,
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
       appBar: const StationAppBar(

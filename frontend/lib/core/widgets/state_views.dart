@@ -75,12 +75,14 @@ class EmptyStateView extends StatelessWidget {
   final String title;
   final String message;
   final IconData icon;
+  final VoidCallback? onRetry;
 
   const EmptyStateView({
     super.key,
     this.title = 'No Records Found',
     this.message = 'There are no entries available for this view.',
     this.icon = Icons.inbox_outlined,
+    this.onRetry,
   });
 
   @override
@@ -107,6 +109,14 @@ class EmptyStateView extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
             ),
+            if (onRetry != null) ...[
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded, size: 16),
+                label: const Text('Refresh'),
+              ),
+            ],
           ],
         ),
       ),
