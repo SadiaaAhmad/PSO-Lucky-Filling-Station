@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Locate backend/.env file relative to this file
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ENV_FILE = BASE_DIR / ".env"
+ENV_FILE_PATH = str(ENV_FILE) if ENV_FILE.exists() else None
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Fuel Station Accounting System"
@@ -19,7 +20,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = ""
 
     model_config = SettingsConfigDict(
-        env_file=str(ENV_FILE),
+        env_file=ENV_FILE_PATH,
         env_file_encoding="utf-8",
         extra="ignore"
     )
