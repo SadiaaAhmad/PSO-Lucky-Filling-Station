@@ -239,6 +239,10 @@ class CustomerApi {
     return CustomerModel.fromJson(data as Map<String, dynamic>);
   }
 
+  static Future<void> deleteCustomer(int customerId) async {
+    await ApiClient.post('/api/v1/customers/$customerId/delete', {});
+  }
+
   static Future<List<CreditTransactionModel>> getCustomerLedger(int customerId, {int skip = 0, int limit = 50}) async {
     final data = await ApiClient.get('/api/v1/customers/$customerId/ledger', {'skip': skip, 'limit': limit});
     return (data as List).map((e) => CreditTransactionModel.fromJson(e)).toList();

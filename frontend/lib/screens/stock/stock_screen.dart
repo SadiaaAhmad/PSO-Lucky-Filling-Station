@@ -79,29 +79,37 @@ class _StockScreenState extends State<StockScreen> with SingleTickerProviderStat
     setState(() { _isLoading = true; _error = null; });
     try {
       _tanks = await MasterApi.getTanks();
+      final latest = await StockApi.getLatestTankStocks();
+
       if (_selectedLog != null) {
-        final detail = await DailyLogApi.getDailyLogDetail(_selectedLog!.id);
-        _latestStocks = detail.tankStocks.map((ts) => LatestTankStockModel(
-          tankId: ts.tankId,
-          tankName: ts.tankName,
-          productCode: ts.productCode,
-          capacityLiters: "25000.00",
-          actualDipLiters: ts.actualDipLiters,
-          purchaseRate: ts.purchaseRate,
-          stockValuePkr: ((double.tryParse(ts.actualDipLiters) ?? 0.0) * (double.tryParse(ts.purchaseRate) ?? 0.0)).toStringAsFixed(2),
-          logDate: detail.logDate,
-        )).toList();
+        try {
+          final detail = await DailyLogApi.getDailyLogDetail(_selectedLog!.id);
+          if (detail.tankStocks.isNotEmpty) {
+            _latestStocks = detail.tankStocks.map((ts) => LatestTankStockModel(
+              tankId: ts.tankId,
+              tankName: ts.tankName,
+              productCode: ts.productCode,
+              capacityLiters: "25000.00",
+              actualDipLiters: ts.actualDipLiters,
+              purchaseRate: ts.purchaseRate,
+              stockValuePkr: ((double.tryParse(ts.actualDipLiters) ?? 0.0) * (double.tryParse(ts.purchaseRate) ?? 0.0)).toStringAsFixed(2),
+              logDate: detail.logDate,
+            )).toList();
+          } else {
+            _latestStocks = latest;
+          }
+        } catch (_) {
+          _latestStocks = latest;
+        }
       } else {
-        _latestStocks = await StockApi.getLatestTankStocks();
+        _latestStocks = latest;
       }
       setState(() => _isLoading = false);
     } catch (e) {
       try {
         _latestStocks = await StockApi.getLatestTankStocks();
-        setState(() => _isLoading = false);
-      } catch (err) {
-        setState(() { _error = err.toString(); _isLoading = false; });
-      }
+      } catch (_) {}
+      setState(() { _isLoading = false; });
     }
   }
 

@@ -250,66 +250,95 @@ class _AccountsScreenState extends State<AccountsScreen> {
     );
   }
 
+  Future<void> _confirmDeleteCustomer(CustomerModel customer) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Customer Account?'),
+        content: Text('Are you sure you want to delete customer account "${customer.name}" (${customer.accountNo})?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.coralRed),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete Account', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await CustomerApi.deleteCustomer(customer.id);
+        _fetchCustomers();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Customer ${customer.name} deleted successfully!'), backgroundColor: AppTheme.emeraldGreen),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error deleting customer: $e'), backgroundColor: AppTheme.coralRed),
+          );
+        }
+      }
+    }
+  }
+
   Widget _buildCustomerCard(CustomerModel customer) {
-    // Determine balance coloring. Using dummy logic: if balance approaches limit, warning color.
     final limit = double.tryParse(customer.creditLimit) ?? 1.0; 
-    final isNearLimit = false;
     final balanceColor = AppTheme.textDark;
 
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CustomerDetailScreen(customerId: customer.id),
-          ),
-        ).then((_) => _fetchCustomers());
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppTheme.borderLight),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppTheme.borderLight),
+      ),
+      child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomerDetailScreen(customerId: customer.id),
+            ),
+          ).then((_) => _fetchCustomers());
+        },
+        leading: CircleAvatar(
+          backgroundColor: AppTheme.navyPrimary.withOpacity(0.1),
+          child: const Icon(Icons.business_rounded, color: AppTheme.navyPrimary),
         ),
-        child: Row(
+        title: Text(
+          customer.name,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textDark),
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          customer.accountNo,
+          style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            CircleAvatar(
-              backgroundColor: AppTheme.navyPrimary.withOpacity(0.1),
-              child: const Icon(Icons.business_rounded, color: AppTheme.navyPrimary),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    customer.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textDark),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    customer.accountNo,
-                    style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                  ),
-                ],
-              ),
-            ),
             Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 const Text('Credit Limit', style: TextStyle(fontSize: 10, color: AppTheme.textMuted)),
                 const SizedBox(height: 2),
                 Text(
                   Formatters.formatPKR(limit),
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: balanceColor),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: balanceColor),
                 ),
               ],
             ),
-            const SizedBox(width: 8),
-            const Icon(Icons.chevron_right_rounded, color: AppTheme.textMuted, size: 20),
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.coralRed, size: 20),
+              tooltip: 'Delete Account',
+              onPressed: () => _confirmDeleteCustomer(customer),
+            ),
           ],
         ),
       ),

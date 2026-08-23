@@ -74,3 +74,14 @@ from backend.app.schemas.credit import CreditTransactionResponse
 @router.get("/{id}/ledger", response_model=List[CreditTransactionResponse])
 def get_customer_ledger(id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return CustomerService.get_customer_ledger(db, id, skip, limit)
+
+@router.delete("/{id}")
+@router.post("/{id}/delete")
+def delete_customer(id: int, db: Session = Depends(get_db)):
+    """Delete a customer account."""
+    try:
+        CustomerService.delete_customer(db, id)
+        api_cache.clear()
+        return {"detail": f"Customer {id} deleted successfully."}
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

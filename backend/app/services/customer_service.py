@@ -130,3 +130,12 @@ class CustomerService:
             CreditTransaction.customer_id == customer_id,
             CreditTransaction.is_reversed == False
         ).order_by(CreditTransaction.created_at.desc()).offset(skip).limit(limit).all()
+
+    @staticmethod
+    def delete_customer(db: Session, customer_id: int):
+        customer = db.query(Customer).filter(Customer.id == customer_id).first()
+        if not customer:
+            raise ValueError(f"Customer {customer_id} not found.")
+        db.delete(customer)
+        db.commit()
+        return True
