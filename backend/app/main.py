@@ -2,18 +2,32 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from backend.app.core.config import settings
 from backend.app.core.logging_config import setup_logging
+from backend.app.database.session import engine
+from backend.app.models import Base
 from backend.app.api.v1.router import api_router
 
 setup_logging()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Automatically initialize PostgreSQL database schema on startup
+    try:
+        Base.metadata.create_all(bind=engine)
+        logging.info("Cloud Database tables checked/created successfully on app startup.")
+    except Exception as e:
+        logging.error(f"Error during startup database creation: {e}")
+    yield
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="Automated Accounting, Stock Inventory, & Reporting REST API for PSO Lucky Filling Station",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Configure CORS Middleware for local frontend development

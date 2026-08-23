@@ -30,6 +30,10 @@ class Settings(BaseSettings):
         else:
             url = f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         
+        # Handle postgres:// vs postgresql:// protocol prefix for cloud DBs (e.g. Render/Supabase)
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        
         # Replace localhost with 127.0.0.1 to avoid Windows IPv6 (::1) auth issues
         if "@localhost" in url:
             url = url.replace("@localhost", "@127.0.0.1")

@@ -73,6 +73,7 @@ The system automates dispenser meter reconciliations, underground storage tank (
      ```
    - **Option B (1-Click Batch File)**: Double-click `start_backend.bat` in the project root.
    - **Option C (100% Silent Background Service)**: Double-click `run_backend_silent.vbs`. *(To run automatically when your PC boots, copy `run_backend_silent.vbs` to your Windows Startup folder: `Win + R` ➔ type `shell:startup`).*
+   - **Option D (24/7 Free Cloud Hosting — Laptop can be OFF)**: Follow the step-by-step [24/7 Cloud Deployment Guide](file:///c:/Users/Sadia%20Ahmad/FuelStationAccounting/DEPLOYMENT.md) to host your backend on **Render.com** and **Neon.tech** for free!
 
 ---
 
