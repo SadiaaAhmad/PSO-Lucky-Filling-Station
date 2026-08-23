@@ -71,6 +71,43 @@ class MasterService:
         return db.execute(select(Account).where(Account.is_active == True).order_by(Account.account_code)).scalars().all()
 
     @staticmethod
+    def create_account(db: Session, data):
+        logger.info(f"Creating account code: {data.account_code}")
+        existing = db.query(Account).filter(Account.account_code == data.account_code).first()
+        if existing:
+            if not existing.is_active:
+                existing.is_active = True
+                existing.name = data.name
+                existing.type = data.type
+                existing.description = data.description
+                db.commit()
+                db.refresh(existing)
+                return existing
+            raise ValueError(f"Account with code '{data.account_code}' already exists.")
+        
+        acc = Account(
+            account_code=data.account_code,
+            name=data.name,
+            type=data.type,
+            description=data.description,
+            is_active=True
+        )
+        db.add(acc)
+        db.commit()
+        db.refresh(acc)
+        return acc
+
+    @staticmethod
+    def delete_account(db: Session, account_id: int):
+        logger.info(f"Deleting (deactivating) account ID: {account_id}")
+        acc = db.query(Account).filter(Account.id == account_id).first()
+        if not acc:
+            raise ValueError(f"Account with ID {account_id} not found.")
+        acc.is_active = False
+        db.commit()
+        return True
+
+    @staticmethod
     def get_station_config(db: Session):
         logger.info("Fetching station config from database")
         config = db.execute(select(StationConfig).limit(1)).scalar_one_or_none()

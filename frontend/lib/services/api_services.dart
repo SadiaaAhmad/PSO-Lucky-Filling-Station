@@ -36,6 +36,24 @@ class MasterApi {
     AppLogger.data('Parsed Accounts', {'count': list.length});
     return list;
   }
+  static Future<AccountModel> createAccount({
+    required String accountCode,
+    required String name,
+    required String type,
+    String? description,
+  }) async {
+    final payload = {
+      'account_code': accountCode,
+      'name': name,
+      'type': type,
+      'description': description,
+    };
+    final data = await ApiClient.post('/api/v1/master/accounts', payload);
+    return AccountModel.fromJson(data as Map<String, dynamic>);
+  }
+  static Future<void> deleteAccount(int accountId) async {
+    await ApiClient.post('/api/v1/master/accounts/$accountId/delete', {});
+  }
   static Future<StationConfigModel> getStationConfig() async {
     final data = await ApiClient.get('/api/v1/master/station-config');
     final config = StationConfigModel.fromJson(data as Map<String, dynamic>);

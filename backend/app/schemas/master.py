@@ -37,6 +37,12 @@ class AccountResponse(BaseSchema):
     description: Optional[str] = None
     is_active: bool
 
+class AccountCreate(BaseModel):
+    account_code: str
+    name: str
+    type: str
+    description: Optional[str] = None
+
 class StationConfigResponse(BaseSchema):
     id: int
     station_name: str
