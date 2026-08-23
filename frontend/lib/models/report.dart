@@ -53,6 +53,9 @@ class DailySummaryModel {
   final String totalCreditSalesPkr;
   final String totalCreditRecoveriesPkr;
   final String totalCardSalesPkr;
+  final String totalExpensesPkr;
+  final String totalRevenuePkr;
+  final String netProfitPkr;
 
   DailySummaryModel({
     required this.logDate,
@@ -63,6 +66,9 @@ class DailySummaryModel {
     required this.totalCreditSalesPkr,
     required this.totalCreditRecoveriesPkr,
     required this.totalCardSalesPkr,
+    this.totalExpensesPkr = "0.00",
+    this.totalRevenuePkr = "0.00",
+    this.netProfitPkr = "0.00",
   });
 
   factory DailySummaryModel.fromJson(Map<String, dynamic> json) {
@@ -75,6 +81,9 @@ class DailySummaryModel {
       totalCreditSalesPkr: json['total_credit_sales_pkr'].toString(),
       totalCreditRecoveriesPkr: json['total_credit_recoveries_pkr'].toString(),
       totalCardSalesPkr: json['total_card_sales_pkr'].toString(),
+      totalExpensesPkr: json['total_expenses_pkr'] != null ? json['total_expenses_pkr'].toString() : "0.00",
+      totalRevenuePkr: json['total_revenue_pkr'] != null ? json['total_revenue_pkr'].toString() : "0.00",
+      netProfitPkr: json['net_profit_pkr'] != null ? json['net_profit_pkr'].toString() : "0.00",
     );
   }
 }

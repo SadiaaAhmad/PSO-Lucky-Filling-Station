@@ -153,13 +153,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Financial Cards Grid
+                final isDailySelected = _selectedLog != null && _dailyData != null;
+                final dateLabel = _selectedLog != null ? Formatters.formatDate(_selectedLog!.logDate) : 'July 2026';
+                final displayNetProfit = (isDailySelected && (double.tryParse(_dailyData!.netProfitPkr) ?? 0) != 0)
+                    ? _dailyData!.netProfitPkr
+                    : _pnlData?.netProfit;
+                final displayRevenue = (isDailySelected && (double.tryParse(_dailyData!.totalRevenuePkr) ?? 0) != 0)
+                    ? _dailyData!.totalRevenuePkr
+                    : _pnlData?.totalIncome;
+                final displayExpenses = (isDailySelected && (double.tryParse(_dailyData!.totalExpensesPkr) ?? 0) != 0)
+                    ? _dailyData!.totalExpensesPkr
+                    : _pnlData?.totalExpenses;
+
                 Row(
                   children: [
                     Expanded(
                       child: _buildMetricCard(
                         title: 'NET PROFIT',
-                        value: Formatters.formatPKR(_pnlData?.netProfit),
-                        subtitle: 'Income - Expenses',
+                        value: Formatters.formatPKR(displayNetProfit),
+                        subtitle: '$dateLabel Net',
                         color: AppTheme.emeraldGreen,
                         icon: Icons.trending_up_rounded,
                       ),
@@ -168,8 +180,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Expanded(
                       child: _buildMetricCard(
                         title: 'REVENUE',
-                        value: Formatters.formatPKR(_pnlData?.totalIncome),
-                        subtitle: 'Margin & Stock Profits',
+                        value: Formatters.formatPKR(displayRevenue),
+                        subtitle: '$dateLabel Margin/Sales',
                         color: AppTheme.navyPrimary,
                         icon: Icons.payments_rounded,
                       ),
@@ -182,8 +194,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Expanded(
                       child: _buildMetricCard(
                         title: 'EXPENSES',
-                        value: Formatters.formatPKR(_pnlData?.totalExpenses),
-                        subtitle: 'Operating Expenses',
+                        value: Formatters.formatPKR(displayExpenses),
+                        subtitle: '$dateLabel Operating',
                         color: AppTheme.coralRed,
                         icon: Icons.account_balance_wallet_rounded,
                       ),
@@ -191,9 +203,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: _buildMetricCard(
-                        title: 'TODAY DISPENSED',
+                        title: 'DISPENSED',
                         value: Formatters.formatLiters(_dailyData?.totalGrossLitersDispensed ?? 0),
-                        subtitle: 'Total Volume',
+                        subtitle: '$dateLabel Volume',
                         color: AppTheme.navyLight,
                         icon: Icons.local_gas_station_rounded,
                       ),

@@ -100,6 +100,39 @@ class ReportService:
         total_recoveries_pkr = sum((r.amount for r in credit_recoveries), Decimal("0.00"))
         total_card_sales_pkr = sum((cd.amount for cd in card_sales), Decimal("0.00"))
 
+        # Daily Operating Expenses
+        expense_accounts = db.query(Account).filter(Account.type == "EXPENSE").all()
+        exp_ids = [a.id for a in expense_accounts]
+        
+        daily_expense_lines = (
+            db.query(JournalLine)
+            .join(JournalEntry)
+            .filter(
+                ((JournalEntry.daily_log_id == daily_log.id) | (JournalEntry.entry_date == log_date)),
+                JournalEntry.is_reversed == False,
+                JournalLine.account_id.in_(exp_ids)
+            )
+            .all()
+        )
+        total_expenses_pkr = sum((l.debit - l.credit for l in daily_expense_lines), Decimal("0.00"))
+
+        # Daily Revenue
+        revenue_accounts = db.query(Account).filter(Account.type == "REVENUE").all()
+        rev_ids = [a.id for a in revenue_accounts]
+        
+        daily_rev_lines = (
+            db.query(JournalLine)
+            .join(JournalEntry)
+            .filter(
+                ((JournalEntry.daily_log_id == daily_log.id) | (JournalEntry.entry_date == log_date)),
+                JournalEntry.is_reversed == False,
+                JournalLine.account_id.in_(rev_ids)
+            )
+            .all()
+        )
+        total_revenue_pkr = sum((l.credit - l.debit for l in daily_rev_lines), Decimal("0.00"))
+        daily_net_profit_pkr = total_revenue_pkr - total_expenses_pkr
+
         return {
             "log_date": str(log_date),
             "status": daily_log.status,
@@ -109,6 +142,9 @@ class ReportService:
             "total_credit_sales_pkr": float(total_credit_sales_pkr),
             "total_credit_recoveries_pkr": float(total_recoveries_pkr),
             "total_card_sales_pkr": float(total_card_sales_pkr),
+            "total_expenses_pkr": float(total_expenses_pkr),
+            "total_revenue_pkr": float(total_revenue_pkr),
+            "net_profit_pkr": float(daily_net_profit_pkr),
         }
 
     @staticmethod
