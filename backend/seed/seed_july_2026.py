@@ -151,8 +151,8 @@ def seed_july_daily_logs(db: Session):
         pmg_actual_dip = parse_decimal(ws.cell(r_pmg, 5).value) # Col 5: Tank Dip
         pmg_exp_closing = parse_decimal(ws.cell(r_pmg, 6).value) # Col 6: Closing Meter
         pmg_rate_diff = parse_decimal(ws.cell(r_pmg, 8).value) # Col 8: Rate Difference
-        pmg_purchase_rate = parse_decimal(ws.cell(r_pmg, 9).value) # Col 9: Purchase Rate
         pmg_lube_oil_sale = parse_decimal(ws.cell(r_pmg, 12).value)
+        pmg_net_sales = pmg_gross_sales - pmg_testing
 
         hsd_opening_dip = hsd_exp_closing + hsd_net_sales + hsd_testing - hsd_stock_in
         pmg_opening_dip = pmg_exp_closing + pmg_net_sales + pmg_testing - pmg_stock_in

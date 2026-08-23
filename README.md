@@ -39,24 +39,34 @@ The system automates dispenser meter reconciliations, underground storage tank (
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Technology Stack & Live Cloud Hosting
 
-| Layer | Technology |
-| :--- | :--- |
-| **Mobile & Desktop Frontend** | Flutter (Dart) — Cross-platform iOS, Android, and Desktop |
-| **REST API Backend** | FastAPI (Python 3.14) with Uvicorn ASGI Server |
-| **Database & ORM** | SQLite / PostgreSQL with SQLAlchemy ORM & Alembic migrations |
-| **Networking** | Self-healing local Wi-Fi IP auto-discovery client (`ApiClient`) |
+| Layer | Technology | Status |
+| :--- | :--- | :--- |
+| **Mobile & Desktop App** | Flutter 3.x (Dart) | Production Build |
+| **24/7 REST API Backend** | FastAPI (Python 3.14) on **Vercel Serverless** | 🟢 Live: `https://pso-lucky-filling-station.vercel.app` |
+| **24/7 Cloud Database** | Neon PostgreSQL (Serverless Cloud DB) | 🟢 Live Connected |
+| **Accounting Engine** | Double-Entry General Ledger (`JournalEntry` & `JournalLine`) | Active Reconciled |
 
 ---
 
-## 🚀 Quick Start Guide (Desktop / Laptop)
+## 🌐 24/7 Mobile Cloud Access (Laptop OFF)
+
+The backend and database are deployed live in the cloud 24/7:
+* **Live API URL**: `https://pso-lucky-filling-station.vercel.app`
+* **Swagger API Docs**: `https://pso-lucky-filling-station.vercel.app/docs`
+
+Your mobile app is pre-configured to communicate directly with your live Vercel cloud server. You can view, record, and manage your station's daily operations, tank dips, credit accounts, and financial reports from anywhere in the world — **even when your laptop is completely powered OFF!**
+
+---
+
+## 🚀 Local Development Setup
 
 ### 1. Prerequisites
 * [Python 3.10+](https://www.python.org/downloads/)
 * [Flutter SDK 3.x+](https://docs.flutter.dev/get-started/install)
 
-### 2. Backend Setup
+### 2. Running Backend Locally
 1. Clone the repository:
    ```bash
    git clone https://github.com/SadiaaAhmad/PSO-Lucky-Filling-Station.git
@@ -66,14 +76,10 @@ The system automates dispenser meter reconciliations, underground storage tank (
    ```bash
    pip install -r backend/requirements.txt
    ```
-3. Launch the Backend Server:
-   - **Option A (Manual)**:
-     ```bash
-     python -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
-     ```
-   - **Option B (1-Click Batch File)**: Double-click `start_backend.bat` in the project root.
-   - **Option C (100% Silent Background Service)**: Double-click `run_backend_silent.vbs`. *(To run automatically when your PC boots, copy `run_backend_silent.vbs` to your Windows Startup folder: `Win + R` ➔ type `shell:startup`).*
-   - **Option D (24/7 Free Cloud Hosting — Laptop can be OFF)**: Follow the step-by-step [24/7 Cloud Deployment Guide](file:///c:/Users/Sadia%20Ahmad/FuelStationAccounting/DEPLOYMENT.md) to host your backend on **Render.com** and **Neon.tech** for free!
+3. Launch local dev server:
+   ```bash
+   python -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
 
 ---
 
