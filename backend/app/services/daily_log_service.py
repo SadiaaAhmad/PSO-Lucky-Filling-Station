@@ -176,11 +176,13 @@ class DailyLogService:
             card_sales += c.amount
             
         expenses = Decimal('0.00')
-        for j in db.query(JournalEntry).filter(JournalEntry.daily_log_id == log_id, JournalEntry.is_reversed == False).all():
-            if 'expense' in str(j.description).lower():
-                for l in j.lines:
-                    if l.debit > 0 and l.account and str(l.account.account_code).startswith('5'):
-                        expenses += l.debit
+        for j in db.query(JournalEntry).filter(
+            ((JournalEntry.daily_log_id == log_id) | (JournalEntry.entry_date == log.log_date)),
+            JournalEntry.is_reversed == False
+        ).all():
+            for l in j.lines:
+                if l.debit > 0 and l.account and str(l.account.account_code).startswith('5'):
+                    expenses += l.debit
                         
         logger.info("[CALC] Computed Cash Movement Summary")
         net_cash = fuel_sales_pkr - credit_sales + credit_recov + card_sales - expenses

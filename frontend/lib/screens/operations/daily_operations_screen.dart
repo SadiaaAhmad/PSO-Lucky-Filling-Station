@@ -229,7 +229,9 @@ class _DailyLogSummaryCardState extends State<DailyLogSummaryCard> {
   @override
   void initState() {
     super.initState();
-    _fetchSummary();
+    if (widget.isHighlighted) {
+      _fetchSummary();
+    }
   }
 
   Future<void> _fetchSummary() async {
