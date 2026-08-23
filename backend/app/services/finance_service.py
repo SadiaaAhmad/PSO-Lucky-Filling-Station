@@ -141,30 +141,39 @@ class FinanceService:
     @staticmethod
     def list_expenses(db: Session, daily_log_id: int):
         import logging
-        from backend.app.models.journal import JournalEntry
+        from sqlalchemy.orm import joinedload
+        from backend.app.models.journal import JournalEntry, JournalLine
         from backend.app.models.daily_logs import DailyLog
         logger = logging.getLogger(__name__)
         logger.info(f"[DATA] List expenses {daily_log_id}")
         
         daily_log = db.query(DailyLog).filter(DailyLog.id == daily_log_id).first()
+        query = db.query(JournalEntry).options(
+            joinedload(JournalEntry.lines).joinedload(JournalLine.account)
+        )
         if daily_log:
-            entries = db.query(JournalEntry).filter(
+            entries = query.filter(
                 ((JournalEntry.daily_log_id == daily_log_id) | (JournalEntry.entry_date == daily_log.log_date)),
                 JournalEntry.is_reversed == False
             ).all()
         else:
-            entries = db.query(JournalEntry).filter(JournalEntry.daily_log_id == daily_log_id, JournalEntry.is_reversed == False).all()
+            entries = query.filter(JournalEntry.daily_log_id == daily_log_id, JournalEntry.is_reversed == False).all()
 
         res = []
         for j in entries:
-            if 'expense' in str(j.description).lower() or any(str(l.account.account_code).startswith('5') for l in j.lines if l.account):
-                for l in j.lines:
-                    if l.debit > 0 and l.account and str(l.account.account_code).startswith('5'):
-                        res.append({
-                            "id": j.id, "daily_log_id": j.daily_log_id, "account_code": l.account.account_code,
-                            "account_name": l.account.name, "amount": l.debit, "description": l.description or j.description,
-                            "payment_method": "Cash", "created_at": j.created_at, "is_reversed": j.is_reversed
-                        })
+            for l in j.lines:
+                if l.debit > 0 and l.account and str(l.account.account_code).startswith('5'):
+                    res.append({
+                        "id": j.id,
+                        "daily_log_id": j.daily_log_id,
+                        "account_code": l.account.account_code,
+                        "account_name": l.account.name,
+                        "amount": str(l.debit),
+                        "description": l.description or j.description,
+                        "payment_method": "Cash",
+                        "created_at": j.created_at,
+                        "is_reversed": j.is_reversed
+                    })
         return res
 
     @staticmethod

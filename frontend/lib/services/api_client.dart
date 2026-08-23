@@ -28,6 +28,7 @@ class ApiClient {
 
   /// Automatically discovers the active FastAPI backend on the local network
   static Future<String?> autoDiscoverBackend() async {
+    if (AppConfig.baseUrl.startsWith('https://')) return AppConfig.baseUrl;
     if (_isAutoDiscovering) return AppConfig.baseUrl;
     _isAutoDiscovering = true;
 
