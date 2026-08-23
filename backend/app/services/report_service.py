@@ -32,6 +32,7 @@ class ReportService:
             .filter(
                 extract('year', JournalEntry.entry_date) == year,
                 extract('month', JournalEntry.entry_date) == month,
+                JournalEntry.is_reversed == False,
                 JournalLine.account_id.in_(rev_ids)
             )
             .all()
@@ -54,6 +55,7 @@ class ReportService:
             .filter(
                 extract('year', JournalEntry.entry_date) == year,
                 extract('month', JournalEntry.entry_date) == month,
+                JournalEntry.is_reversed == False,
                 JournalLine.account_id.in_(exp_ids)
             )
             .all()
