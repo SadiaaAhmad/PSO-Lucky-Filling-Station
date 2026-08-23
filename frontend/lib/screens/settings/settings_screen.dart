@@ -25,6 +25,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isTestingConnection = false;
   String? _connectionStatus;
 
+  List<AccountModel> _accounts = [];
+
   @override
   void initState() {
     super.initState();
@@ -41,12 +43,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final config = await MasterApi.getStationConfig();
       final tanks = await MasterApi.getTanks();
       final units = await MasterApi.getDispensingUnits();
+      final accounts = await MasterApi.getAccounts();
 
       if (mounted) {
         setState(() {
           _config = config;
           _tanks = tanks;
           _units = units;
+          _accounts = accounts;
           _currentApiUrl = AppConfig.apiBaseUrl;
           _isLoading = false;
         });
@@ -59,6 +63,130 @@ class _SettingsScreenState extends State<SettingsScreen> {
         });
       }
     }
+  }
+
+  Future<void> _confirmDeleteAccount(AccountModel account) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Account?'),
+        content: Text('Are you sure you want to delete/deactivate "${account.accountCode} - ${account.name}" from your Chart of Accounts?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.coralRed),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete Account', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await MasterApi.deleteAccount(account.id);
+        _loadSettings();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Account ${account.accountCode} deleted successfully!'), backgroundColor: AppTheme.emeraldGreen),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error deleting account: $e'), backgroundColor: AppTheme.coralRed),
+          );
+        }
+      }
+    }
+  }
+
+  void _showCreateAccountModal() {
+    final codeCtrl = TextEditingController();
+    final nameCtrl = TextEditingController();
+    String selectedType = 'EXPENSE';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            return Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Add New Account', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.navyPrimary)),
+                        IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    const Text('Account Code', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    TextField(controller: codeCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 5080', border: OutlineInputBorder())),
+                    const SizedBox(height: 12),
+
+                    const Text('Account Name', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    TextField(controller: nameCtrl, decoration: const InputDecoration(hintText: 'e.g. Generator Maintenance', border: OutlineInputBorder())),
+                    const SizedBox(height: 12),
+
+                    const Text('Account Type', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    DropdownButtonFormField<String>(
+                      value: selectedType,
+                      decoration: const InputDecoration(border: OutlineInputBorder()),
+                      items: const [
+                        DropdownMenuItem(value: 'ASSET', child: Text('ASSET (1000s)')),
+                        DropdownMenuItem(value: 'LIABILITY', child: Text('LIABILITY (2000s)')),
+                        DropdownMenuItem(value: 'EQUITY', child: Text('EQUITY (3000s)')),
+                        DropdownMenuItem(value: 'REVENUE', child: Text('REVENUE (4000s)')),
+                        DropdownMenuItem(value: 'EXPENSE', child: Text('EXPENSE (5000s)')),
+                      ],
+                      onChanged: (v) => setModalState(() => selectedType = v ?? 'EXPENSE'),
+                    ),
+                    const SizedBox(height: 20),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.navyPrimary),
+                        onPressed: () async {
+                          if (codeCtrl.text.trim().isEmpty || nameCtrl.text.trim().isEmpty) return;
+                          final nav = Navigator.of(ctx);
+                          try {
+                            await MasterApi.createAccount(
+                              accountCode: codeCtrl.text.trim(),
+                              name: nameCtrl.text.trim(),
+                              type: selectedType,
+                            );
+                            nav.pop();
+                            _loadSettings();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.coralRed));
+                          }
+                        },
+                        child: const Text('Save Account', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   void _editProfileModal() {
@@ -428,7 +556,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   );
                 },
+            ),
+            const SizedBox(height: 20),
+
+            // Chart of Accounts Management Section
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildSectionHeader('Chart of Accounts (${_accounts.length})', Icons.account_balance_wallet_rounded),
+                TextButton.icon(
+                  onPressed: _showCreateAccountModal,
+                  icon: const Icon(Icons.add_circle_outline, size: 16, color: AppTheme.navyPrimary),
+                  label: const Text('Add Account', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.navyPrimary)),
+                ),
+              ],
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppTheme.borderLight),
               ),
+              child: _accounts.isEmpty
+                  ? const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text('No custom accounts found.', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+                    )
+                  : ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _accounts.length,
+                      separatorBuilder: (ctx, i) => const Divider(height: 1),
+                      itemBuilder: (ctx, i) {
+                        final acc = _accounts[i];
+                        return ListTile(
+                          dense: true,
+                          title: Text(
+                            '${acc.accountCode} - ${acc.name}',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.navyPrimary),
+                          ),
+                          subtitle: Text(
+                            'Type: ${acc.type}',
+                            style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.coralRed, size: 20),
+                            tooltip: 'Delete Account',
+                            onPressed: () => _confirmDeleteAccount(acc),
+                          ),
+                        );
+                      },
+                    ),
             ),
             const SizedBox(height: 20),
 
