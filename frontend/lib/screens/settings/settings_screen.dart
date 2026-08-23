@@ -173,7 +173,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             nav.pop();
                             _loadSettings();
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.coralRed));
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.coralRed));
+                            }
                           }
                         },
                         child: const Text('Save Account', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -375,8 +377,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () async {
               final newUrl = urlCtrl.text.trim();
               if (newUrl.isNotEmpty) {
+                final nav = Navigator.of(ctx);
                 await AppConfig.setApiBaseUrl(newUrl);
-                Navigator.pop(ctx);
+                nav.pop();
                 setState(() => _currentApiUrl = newUrl);
                 _loadSettings();
               }
