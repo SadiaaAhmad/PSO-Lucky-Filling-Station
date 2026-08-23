@@ -38,10 +38,18 @@ def close_daily_log(id: int, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
+from backend.app.core.cache import api_cache
+
 @router.get("/", response_model=List[DailyLogResponse])
 def list_daily_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    """List daily logs with pagination."""
-    return DailyLogService.get_daily_logs(db, skip=skip, limit=limit)
+    """List daily logs with pagination and instant in-memory response cache."""
+    cache_key = f"list_daily_logs_{skip}_{limit}"
+    cached = api_cache.get(cache_key)
+    if cached is not None:
+        return cached
+    res = DailyLogService.get_daily_logs(db, skip=skip, limit=limit)
+    api_cache.set(cache_key, res, ttl_seconds=60)
+    return res
 
 @router.delete("/{id}")
 @router.post("/{id}/delete")
@@ -49,6 +57,7 @@ def delete_daily_log(id: int, db: Session = Depends(get_db)):
     """Delete a daily log and all associated records."""
     try:
         DailyLogService.delete_daily_log(db, log_id=id)
+        api_cache.clear()
         return {"detail": f"Daily log {id} deleted successfully."}
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -57,11 +66,13 @@ def delete_daily_log(id: int, db: Session = Depends(get_db)):
 from backend.app.schemas.daily_log import DailyLogDetailResponse
 @router.get("/{log_id}/detail", response_model=DailyLogDetailResponse)
 def get_daily_log_detail(log_id: int, db: Session = Depends(get_db)):
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.info(f"[API] GET /daily-logs/{log_id}/detail")
+    cache_key = f"daily_log_detail_{log_id}"
+    cached = api_cache.get(cache_key)
+    if cached is not None:
+        return cached
     try:
-        return DailyLogService.get_daily_log_detail(db, log_id)
+        res = DailyLogService.get_daily_log_detail(db, log_id)
+        api_cache.set(cache_key, res, ttl_seconds=60)
+        return res
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
-

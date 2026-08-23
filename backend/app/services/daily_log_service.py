@@ -68,9 +68,76 @@ class DailyLogService:
         return True
 
     @staticmethod
-    def get_daily_logs(db: Session, skip: int = 0, limit: int = 100) -> List[DailyLog]:
-        """List daily logs with pagination."""
-        return db.query(DailyLog).order_by(DailyLog.log_date.desc()).offset(skip).limit(limit).all()
+    def get_daily_logs(db: Session, skip: int = 0, limit: int = 100):
+        """List daily logs with embedded summary data for 100% fast, instant rendering."""
+        from decimal import Decimal
+        from sqlalchemy.orm import joinedload
+        from backend.app.models.daily_logs import DailyLog
+        from backend.app.models.nozzle_readings import NozzleReading
+        from backend.app.models.daily_tank_stocks import DailyTankStock
+        from backend.app.models.credit_transactions import CreditTransaction
+        from backend.app.models.card_transactions import CardTransaction
+        from backend.app.models.journal import JournalEntry, JournalLine
+
+        logs = db.query(DailyLog).order_by(DailyLog.log_date.desc()).offset(skip).limit(limit).all()
+        log_ids = [l.id for l in logs]
+
+        if not log_ids:
+            return []
+
+        nozzle_map = {}
+        for nr in db.query(NozzleReading).filter(NozzleReading.daily_log_id.in_(log_ids), NozzleReading.is_reversed == False).all():
+            nozzle_map[nr.daily_log_id] = nozzle_map.get(nr.daily_log_id, Decimal("0.00")) + (nr.gross_sale_liters or Decimal("0.00"))
+
+        card_map = {}
+        for ct in db.query(CardTransaction).filter(CardTransaction.daily_log_id.in_(log_ids), CardTransaction.is_reversed == False).all():
+            card_map[ct.daily_log_id] = card_map.get(ct.daily_log_id, Decimal("0.00")) + (ct.amount or Decimal("0.00"))
+
+        credit_sale_map = {}
+        credit_recov_map = {}
+        for cr in db.query(CreditTransaction).filter(CreditTransaction.daily_log_id.in_(log_ids), CreditTransaction.is_reversed == False).all():
+            if cr.transaction_type == 'CREDIT_SALE':
+                credit_sale_map[cr.daily_log_id] = credit_sale_map.get(cr.daily_log_id, Decimal("0.00")) + (cr.amount or Decimal("0.00"))
+            elif cr.transaction_type == 'CREDIT_RECOVERY':
+                credit_recov_map[cr.daily_log_id] = credit_recov_map.get(cr.daily_log_id, Decimal("0.00")) + (cr.amount or Decimal("0.00"))
+
+        expense_map = {}
+        j_lines = (
+            db.query(JournalLine)
+            .join(JournalEntry)
+            .options(joinedload(JournalLine.account))
+            .filter(
+                JournalEntry.daily_log_id.in_(log_ids),
+                JournalEntry.is_reversed == False
+            )
+            .all()
+        )
+        for jl in j_lines:
+            if jl.debit > 0 and jl.account and str(jl.account.account_code).startswith('5'):
+                log_id = jl.journal_entry.daily_log_id
+                expense_map[log_id] = expense_map.get(log_id, Decimal("0.00")) + jl.debit
+
+        res = []
+        for l in logs:
+            summary = {
+                "gross_liters_dispensed": nozzle_map.get(l.id, Decimal("0.00")),
+                "card_sales_pkr": card_map.get(l.id, Decimal("0.00")),
+                "credit_sales_pkr": credit_sale_map.get(l.id, Decimal("0.00")),
+                "credit_recoveries_pkr": credit_recov_map.get(l.id, Decimal("0.00")),
+                "expenses_pkr": expense_map.get(l.id, Decimal("0.00")),
+                "actual_dip_hsd": Decimal("0.00"),
+                "actual_dip_pmg": Decimal("0.00"),
+            }
+            res.append({
+                "id": l.id,
+                "log_date": l.log_date,
+                "status": l.status,
+                "notes": l.notes,
+                "created_at": l.created_at,
+                "updated_at": l.updated_at,
+                "summary": summary
+            })
+        return res
 
 
     @staticmethod

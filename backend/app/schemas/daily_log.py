@@ -14,6 +14,15 @@ class DailyLogUpdate(BaseSchema):
     status: Optional[str] = Field(None, pattern="^(DRAFT|CLOSED)$")
     notes: Optional[str] = Field(None, max_length=500)
 
+class DailyLogSummaryEmbed(BaseModel):
+    gross_liters_dispensed: Decimal = Decimal('0.00')
+    card_sales_pkr: Decimal = Decimal('0.00')
+    credit_sales_pkr: Decimal = Decimal('0.00')
+    credit_recoveries_pkr: Decimal = Decimal('0.00')
+    expenses_pkr: Decimal = Decimal('0.00')
+    actual_dip_hsd: Decimal = Decimal('0.00')
+    actual_dip_pmg: Decimal = Decimal('0.00')
+
 class DailyLogResponse(BaseSchema):
     id: int
     log_date: date
@@ -21,6 +30,7 @@ class DailyLogResponse(BaseSchema):
     notes: Optional[str] = None
     created_at: datetime
     updated_at: datetime
+    summary: Optional[DailyLogSummaryEmbed] = None
 
 class NozzleReadingDetail(BaseSchema):
     id: int

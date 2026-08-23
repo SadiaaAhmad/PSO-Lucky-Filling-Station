@@ -1,3 +1,29 @@
+class EmbeddedLogSummary {
+  final String grossLitersDispensed;
+  final String cardSalesPkr;
+  final String creditSalesPkr;
+  final String creditRecoveriesPkr;
+  final String expensesPkr;
+
+  EmbeddedLogSummary({
+    required this.grossLitersDispensed,
+    required this.cardSalesPkr,
+    required this.creditSalesPkr,
+    required this.creditRecoveriesPkr,
+    required this.expensesPkr,
+  });
+
+  factory EmbeddedLogSummary.fromJson(Map<String, dynamic> json) {
+    return EmbeddedLogSummary(
+      grossLitersDispensed: json['gross_liters_dispensed']?.toString() ?? '0.00',
+      cardSalesPkr: json['card_sales_pkr']?.toString() ?? '0.00',
+      creditSalesPkr: json['credit_sales_pkr']?.toString() ?? '0.00',
+      creditRecoveriesPkr: json['credit_recoveries_pkr']?.toString() ?? '0.00',
+      expensesPkr: json['expenses_pkr']?.toString() ?? '0.00',
+    );
+  }
+}
+
 class DailyLogModel {
   final int id;
   final String logDate;
@@ -5,6 +31,7 @@ class DailyLogModel {
   final String? notes;
   final String createdAt;
   final String updatedAt;
+  final EmbeddedLogSummary? summary;
 
   DailyLogModel({
     required this.id,
@@ -13,6 +40,7 @@ class DailyLogModel {
     this.notes,
     required this.createdAt,
     required this.updatedAt,
+    this.summary,
   });
 
   factory DailyLogModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +51,7 @@ class DailyLogModel {
       notes: json['notes'] as String?,
       createdAt: json['created_at'] as String,
       updatedAt: json['updated_at'] as String,
+      summary: json['summary'] != null ? EmbeddedLogSummary.fromJson(json['summary']) : null,
     );
   }
 

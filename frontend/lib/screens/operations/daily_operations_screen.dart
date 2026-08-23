@@ -259,10 +259,11 @@ class _DailyLogSummaryCardState extends State<DailyLogSummaryCard> {
     final statusColor = isClosed ? AppTheme.emeraldGreen : AppTheme.amberWarning;
     final statusBg = isClosed ? AppTheme.emeraldBg : AppTheme.amberBg;
 
-    final grossLiters = _summary != null ? Formatters.formatLiters(_summary!.totalGrossLitersDispensed) : '-- L';
-    final creditSales = _summary != null ? Formatters.formatPKR(_summary!.totalCreditSalesPkr) : 'PKR 0.00';
-    final recoveries = _summary != null ? Formatters.formatPKR(_summary!.totalCreditRecoveriesPkr) : 'PKR 0.00';
-    final cardSales = _summary != null ? Formatters.formatPKR(_summary!.totalCardSalesPkr) : 'PKR 0.00';
+    final sum = widget.log.summary;
+    final grossLiters = sum != null ? Formatters.formatLiters(sum.grossLitersDispensed) : (_summary != null ? Formatters.formatLiters(_summary!.totalGrossLitersDispensed) : '-- L');
+    final creditSales = sum != null ? Formatters.formatPKR(sum.creditSalesPkr) : (_summary != null ? Formatters.formatPKR(_summary!.totalCreditSalesPkr) : 'PKR 0.00');
+    final recoveries = sum != null ? Formatters.formatPKR(sum.creditRecoveriesPkr) : (_summary != null ? Formatters.formatPKR(_summary!.totalCreditRecoveriesPkr) : 'PKR 0.00');
+    final cardSales = sum != null ? Formatters.formatPKR(sum.cardSalesPkr) : (_summary != null ? Formatters.formatPKR(_summary!.totalCardSalesPkr) : 'PKR 0.00');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
